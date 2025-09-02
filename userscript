@@ -2,7 +2,7 @@
 // @name         YouTube Auto-Hide Progress Bar
 // @description  Auto-hide YouTube video player controls and progress bar. Hover to reveal.
 // @namespace    https://github.com/sonnenfell/Hide-YouTube-Progress-Bar
-// @version      1.4 - Only override on Pause by default
+// @version      1.5 - Reduce interference with video player
 // @license      GPL-3.0
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @author       Sunfur
@@ -70,7 +70,7 @@ const observer = new MutationObserver(() => {
               controls.style.pointerEvents = 'auto';
 
               hoverToggle.style.bottom = '17%';
-              hoverToggle.style.height = '10%';
+              hoverToggle.style.height = '5%';
               isHoverInLowerPosition = false;
           } else {
               progressBar.style.opacity = '0';
