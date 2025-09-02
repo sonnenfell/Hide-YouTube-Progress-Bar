@@ -1,0 +1,96 @@
+// ==UserScript==
+// @name         YouTube Auto-Hide Progress Bar
+// @description  Auto-hide YouTube video player controls and progress bar. Hover to reveal.
+// @namespace    https://github.com/sonnenfell/Hide-YouTube-Progress-Bar
+// @version      1.2
+// @license      GPL-3.0
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
+// @author       Sunfur
+// @match        https://www.youtube.com/*
+// @grant        none
+// ==/UserScript==
+let hoverToggle;
+let isHoverInLowerPosition = true;
+let autoHideWhilePlaying = true; // false: only hide while paused -> known bug: stays hidden if hidden while unpausing, will not fix because minor
+
+const setupHoverToggle = () => {
+    const player = document.querySelector('.html5-video-player');
+    if (!player || hoverToggle) return;
+
+    player.style.position = 'relative';
+
+    hoverToggle = document.createElement('div');
+    hoverToggle.style.position = 'absolute';
+    hoverToggle.style.left = '0';
+    hoverToggle.style.width = '100%';
+    hoverToggle.style.zIndex = '9998';
+    hoverToggle.style.pointerEvents = 'auto';
+    hoverToggle.style.background = 'transparent';
+
+    player.appendChild(hoverToggle);
+};
+
+const observer = new MutationObserver(() => {
+    const video = document.querySelector('video');
+    const player = document.querySelector('.html5-video-player');
+    const progressBar = document.querySelector('.ytp-progress-bar');
+    const controls = document.querySelector('.ytp-chrome-bottom');
+
+    if (!video || !player || !progressBar || !controls) return;
+
+    setupHoverToggle();
+
+    controls.style.position = 'absolute';
+    controls.style.bottom = '0px';
+    controls.style.zIndex = '9999';
+
+    progressBar.style.position = 'absolute';
+    progressBar.style.bottom = '0px';
+    progressBar.style.zIndex = '9999';
+
+    const updateVisibility = () => {
+        if (!isHoverInLowerPosition) return;
+
+        const shouldHide = autoHideWhilePlaying ? true : video.paused;
+
+        if (shouldHide) {
+            progressBar.style.opacity = '0';
+            controls.style.opacity = '0';
+            controls.style.pointerEvents = 'none';
+
+            hoverToggle.style.bottom = '0';
+            hoverToggle.style.height = '10%';
+            isHoverInLowerPosition = true;
+        }
+    };
+
+    updateVisibility();
+
+    hoverToggle.onmouseenter = () => {
+        const isVisible = controls.style.opacity === '1';
+
+        const shouldHide = autoHideWhilePlaying ? true : video.paused;
+
+        if (shouldHide) {
+            if (!isVisible) {
+                progressBar.style.opacity = '1';
+                controls.style.opacity = '1';
+                controls.style.pointerEvents = 'auto';
+
+                hoverToggle.style.bottom = '13%';
+                hoverToggle.style.height = '5%';
+                isHoverInLowerPosition = false;
+            } else {
+                progressBar.style.opacity = '0';
+                controls.style.opacity = '0';
+                controls.style.pointerEvents = 'none';
+
+                hoverToggle.style.bottom = '0';
+                hoverToggle.style.height = '10%';
+                isHoverInLowerPosition = true;
+            }
+        }
+    };
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
