@@ -7,7 +7,7 @@ To use this script, you will need a userscript manager such as [Violentmonkey](h
 
 To add the script, open the extensions menu and create a new script. This should redirect you to the extensions editor with a userscript template.
 
-Click on "userscript.json" in this repository to see the code. Select all the code and copy it. Replace the contents of the userscript template with the code you just copied and save it.
+Click on the "userscript" file in this repository to see the code. Select all the code and copy it. Replace the contents of the userscript template with the code you just copied and save it.
 
 The userscript is now installed and can be toggled using your userscript manager extension.
 
