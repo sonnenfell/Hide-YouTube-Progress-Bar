@@ -2,7 +2,7 @@ A simple user script that automatically hides the progress bar and icons in YouT
 
 I made this script because I was annoyed that the progress bar would always block a part of the video while it's paused, and sometimes take an awkwardly long time to disappear when the video is unpaused.
 
-If you want this script to override YouTube's own auto-hide system while the video is playing (as opposed to only while it's paused), you'll need to set the variable onlyOnPause to false. This is also documented in the code itself.
+If you want this script to override YouTube's own auto-hide system while the video is playing (as opposed to only while it's paused), you'll need to set the variable onlyOnPause to false in line 16 of the code. This is also documented in the code itself.
 
 # How to install
 [This script is also available on greasyfork](https://greasyfork.org/en/scripts/548136-youtube-auto-hide-progress-bar)
