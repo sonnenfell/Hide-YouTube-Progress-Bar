@@ -13,7 +13,7 @@
 // ==/UserScript==
 let hoverToggle;
 let isHoverInLowerPosition = true;
-let onlyOnPause = true
+let onlyOnPause = true; // If you want this scripts auto-hide feature to override YouTube's even while the video is not paused, simply replace "let onlyOnPause = true;" with "let onlyOnPause = false;"
 
 const setupHoverToggle = () => {
     const player = document.querySelector('.html5-video-player');
