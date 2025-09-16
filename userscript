@@ -86,7 +86,7 @@ const observer = new MutationObserver(() => {
             progressBar.style.removeProperty('opacity');
             controls.style.removeProperty('opacity');
             controls.style.removeProperty('pointer-events');
-            hoverToggle.style.height = '2%';
+            hoverToggle.style.height = '1px';
         }
     };
 });
