@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         YouTube Auto-Hide Progress Bar
-// @description  Auto-hide YouTube video player controls and progress bar. Hover to reveal.
+// @description  Auto-hide YouTube video controls and progress bar while paused. Hover to reveal.
 // @namespace    https://github.com/sonnenfell/Hide-YouTube-Progress-Bar
-// @version      1.5.3 - Bug Fix
+// @version      1.6.0
+// @patchnotes   Fixed a bug where controls sometimes got stuck in revealed state after unpausing and didn't revert back to YT default. The code also looks cleaner now :)
 // @license      GPL-3.0
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @author       Sunfur
@@ -12,83 +13,85 @@
 // @updateURL https://update.greasyfork.org/scripts/548136/YouTube%20Auto-Hide%20Progress%20Bar.meta.js
 // ==/UserScript==
 let hoverToggle;
-let isHoverInLowerPosition = true;
-let onlyOnPause = true; // If you want this scripts auto-hide feature to override YouTube's even while the video is not paused, simply replace "let onlyOnPause = true;" with "let onlyOnPause = false;"
+let elements_shown = true;
 
 const setupHoverToggle = () => {
-    const player = document.querySelector('.html5-video-player');
-    if (!player || hoverToggle) return;
+  const player = document.querySelector('.html5-video-player');
+  if (!player || hoverToggle) return;
 
-    player.style.position = 'relative';
+  player.style.position = 'relative';
 
-    hoverToggle = document.createElement('div');
-    hoverToggle.style.position = 'absolute';
-    hoverToggle.style.left = '0';
-    hoverToggle.style.width = '100%';
-    hoverToggle.style.zIndex = '9998';
-    hoverToggle.style.pointerEvents = 'auto';
-    hoverToggle.style.background = 'transparent';
+  hoverToggle = document.createElement('div');
+  hoverToggle.style.position = 'absolute';
+  hoverToggle.style.left = '0';
+  hoverToggle.style.bottom = '0';
+  hoverToggle.style.width = '100%';
+  hoverToggle.style.height = '20%';
+  hoverToggle.style.zIndex = '9998';
+  hoverToggle.style.pointerEvents = 'auto';
+  hoverToggle.style.background = 'transparent';
 
-    player.appendChild(hoverToggle);
+  player.appendChild(hoverToggle);
 };
 
 const observer = new MutationObserver(() => {
-    const video = document.querySelector('video');
-    const player = document.querySelector('.html5-video-player');
-    const progressBar = document.querySelector('.ytp-progress-bar');
-    const controls = document.querySelector('.ytp-chrome-bottom');
+  const video = document.querySelector('video');
+  const player = document.querySelector('.html5-video-player');
+  const progressBar = document.querySelector('.ytp-progress-bar');
+  const controls = document.querySelector('.ytp-chrome-bottom');
 
-    if (!video || !player || !progressBar || !controls) return;
+  if (!video || !player || !progressBar || !controls) return;
 
-    setupHoverToggle();
+  setupHoverToggle();
 
-    const updateVisibility = () => {
-        if (!isHoverInLowerPosition) return;
+  const show_elements = () => {
+    progressBar.style.opacity = '1';
+    controls.style.opacity = '1';
+    controls.style.pointerEvents = 'auto';
+    // move div above controls area (else it will interfere with controls):
+    hoverToggle.style.bottom = '20%';
+    hoverToggle.style.height = '5%';
 
-        progressBar.style.opacity = '0';
-        controls.style.opacity = '0';
-        controls.style.pointerEvents = 'none';
+    elements_shown = true;
 
-        hoverToggle.style.bottom = '0';
-        hoverToggle.style.height = '14%';
-        isHoverInLowerPosition = true;
-    };
+  };
 
-    if (!onlyOnPause) {
-    updateVisibility();
-    } else if (video.paused) {
-      updateVisibility();
-    };
+  const hide_elements = () => {
+    progressBar.style.opacity = '0';
+    controls.style.opacity = '0';
+    controls.style.pointerEvents = 'none';
+    // move div to controls area:
+    hoverToggle.style.bottom = '0%';
+    hoverToggle.style.height = '20%';
 
-    hoverToggle.onmouseenter = () => {
-        const isVisible = controls.style.opacity === '1';
+    elements_shown = false;
+  };
 
-        if (!onlyOnPause || video.paused) {
-          if (!isVisible) {
-              progressBar.style.opacity = '1';
-              controls.style.opacity = '1';
-              controls.style.pointerEvents = 'auto';
+  const release_elements = () => {
+    progressBar.style.removeProperty('opacity');
+    controls.style.removeProperty('opacity');
+    controls.style.removeProperty('pointer-events');
+    // move div above controls area:
+    hoverToggle.style.bottom = '20%';
+    hoverToggle.style.height = '5%';
+  };
 
-              hoverToggle.style.bottom = '17%';
-              hoverToggle.style.height = '5%';
-              isHoverInLowerPosition = false;
-          } else {
-              progressBar.style.opacity = '0';
-              controls.style.opacity = '0';
-              controls.style.pointerEvents = 'none';
+  // Hover logic
+  hoverToggle.onmouseenter = () => {
+    if (video.paused) {
+      if (elements_shown == false) {show_elements();}
+      else if (elements_shown == true) {hide_elements();}
+    }
+  };
 
-              hoverToggle.style.bottom = '0';
-              hoverToggle.style.height = '14%';
-              isHoverInLowerPosition = true;
-          }
-        }
-        else {
-            progressBar.style.removeProperty('opacity');
-            controls.style.removeProperty('opacity');
-            controls.style.removeProperty('pointer-events');
-            hoverToggle.style.height = '1px';
-        }
-    };
+  // Event listeners
+  video.addEventListener('pause', () => {
+    show_elements();
+  });
+
+  video.addEventListener('play', () => {
+    release_elements(); // restore defaults when playing
+  });
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
