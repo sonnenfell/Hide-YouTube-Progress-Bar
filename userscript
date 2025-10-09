@@ -2,8 +2,8 @@
 // @name         YouTube Auto-Hide Progress Bar
 // @description  Auto-hide YouTube video controls and progress bar while paused. Hover to reveal.
 // @namespace    https://github.com/sonnenfell/Hide-YouTube-Progress-Bar
-// @version      1.6.1
-// @patchnotes   Fixed a bug where controls sometimes got stuck in revealed state after unpausing and didn't revert back to YT default. The code also looks cleaner now :)
+// @version      1.6.2
+// @patchnotes   Fixed a bug where the plugin would initially block you from interacting with some video controls before pausing and unpausing the video
 // @license      GPL-3.0
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @author       Sunfur
@@ -26,7 +26,7 @@ const setupHoverToggle = () => {
   hoverToggle.style.left = '0';
   hoverToggle.style.bottom = '0';
   hoverToggle.style.width = '100%';
-  hoverToggle.style.height = '20%';
+  hoverToggle.style.height = '0%';
   hoverToggle.style.zIndex = '9998';
   hoverToggle.style.pointerEvents = 'auto';
   hoverToggle.style.background = 'transparent';
@@ -50,7 +50,7 @@ const observer = new MutationObserver(() => {
     controls.style.pointerEvents = 'auto';
     // move div above controls area (else it will interfere with controls):
     hoverToggle.style.bottom = '20%';
-    hoverToggle.style.height = '5%';
+    hoverToggle.style.height = '20%';
 
     elements_shown = true;
 
